@@ -1,0 +1,47 @@
+# Python cache & compiled files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environment
+venv/
+.env
+*.env
+.env.local
+
+# IDE & Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs & temp files
+logs/
+*.log
+debug.log
+nohup.out
+
+# Database files
+*.sqlite3
+*.db
+migrations/
+
+# Docker-related files
+docker-compose.override.yml
+.env.docker
+
+# Dependencies
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Ignore uploaded files
+uploads/
+media/
+asset/
+
+# Ignore Jupyter notebooks checkpoints (if used)
+.ipynb_checkpoints/
+
+# Ignore FastAPI static & generated files
+static/

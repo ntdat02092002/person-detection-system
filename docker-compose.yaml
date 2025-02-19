@@ -1,0 +1,49 @@
+version: "1.0"
+
+services:
+  db:
+    image: postgres:latest
+    container_name: postgres_container
+    environment:
+      POSTGRES_USER: youruser
+      POSTGRES_PASSWORD: yourpassword
+      POSTGRES_DB: yourdb
+    ports:
+      - "5432:5432"
+    networks:
+      - mynetwork
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: nextjs_container
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://backend:8000
+    depends_on:
+      - backend
+    networks:
+      - mynetwork
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: fastapi_container
+    volumes:
+      - ./asset:/app/asset
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://youruser:yourpassword@db:5432/yourdb
+      - BASE_IMAGE_PATH=/app/asset
+    depends_on:
+      - db
+    networks:
+      - mynetwork
+
+networks:
+  mynetwork:
+    driver: bridge
