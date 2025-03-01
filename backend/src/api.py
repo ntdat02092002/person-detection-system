@@ -42,14 +42,14 @@ class ImageRequest(BaseModel):
 
     @validator("file")
     async def validate_image_file(cls, value):
-        # Kiểm tra định dạng file ảnh
-        contents = await value.read(100)  # Đọc một phần nhỏ để xác định loại ảnh
+        # Check image file format
+        contents = await value.read(100)  # Read a small portion to determine the image type
         file_extension = imghdr.what(None, h=contents)
         
         if file_extension not in ["jpeg", "png"]:
             raise HTTPException(status_code=400, detail="File must be an image of type JPEG or PNG")
         
-        # Reset lại vị trí file về đầu để có thể đọc lại
+        # Reset file position to the beginning for rereading
         await value.seek(0)
         return value
 
@@ -60,7 +60,7 @@ BASE_IMAGE_PATH = os.getenv("BASE_IMAGE_PATH", "./asset")
 @app.post("/process-image/")
 # async def process_image(file: UploadFile = File(...)):
 async def process_image(file: UploadFile = File(...), db: Session = Depends(get_db)):
-    # Đọc file ảnh từ request
+    # Read image file from request
     contents = await file.read()
     nparr = np.frombuffer(contents, np.uint8)
     image = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
@@ -69,10 +69,10 @@ async def process_image(file: UploadFile = File(...), db: Session = Depends(get_
     result = results[0]
     count = 0
     for box in result.boxes:
-        if int(box.cls) == 0:  # Lớp 0 là "person"
+        if int(box.cls) == 0: # Class 0 is "person"
             print(box.xyxy)
             x1, y1, x2, y2 = map(int, box.xyxy[0])
-            cv2.rectangle(image, (x1, y1), (x2, y2), (0, 255, 0), 2)  # Vẽ bbox
+            cv2.rectangle(image, (x1, y1), (x2, y2), (0, 255, 0), 2)  # Draw bounding box
             count += 1
 
     _, img_encoded = cv2.imencode(".jpg", image)
